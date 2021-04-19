@@ -35,12 +35,13 @@ def db_drop_and_create_all():
     db.create_all()
     # add one demo row which is helping in POSTMAN test
     drink = Drink(
-        title='water',
-        recipe='[{"name": "water", "color": "blue", "parts": 1}]'
+        title="Water",
+        recipe='[{"name": "Water", "color": "Blue", "parts": 1}]'
     )
+    drink.insert()
+    del drink
 
 
-drink.insert()
 # ROUTES
 
 '''
@@ -64,7 +65,6 @@ class Drink(db.Model):
     '''
 
     def short(self):
-        print(json.loads(self.recipe))
         short_recipe = [{'color': r['color'], 'parts': r['parts']} for r in json.loads(self.recipe)]
         return {
             'id': self.id,

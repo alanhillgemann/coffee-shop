@@ -5,7 +5,7 @@ App module
 import json
 from flask import abort, Flask, jsonify, request
 from flask_cors import CORS
-from schema import And, Schema, SchemaError, Use
+from schema import And, Optional, Schema, SchemaError, Use
 from sqlalchemy import func
 from .auth.auth import AuthError, requires_auth
 from .database.models import db_drop_and_create_all, setup_db, Drink
@@ -15,19 +15,22 @@ setup_db(app)
 CORS(app)
 db_drop_and_create_all()
 
+
 # HELPERS
+
 
 def is_valid_schema(data):
     '''Check data schema is valid'''
     schema = Schema({
-        'title': And(Use(str), len),
+        Optional('id'): And(Use(int)),
         'recipe': [
             {
                 'name': And(Use(str), len),
                 'color': And(Use(str), len),
                 'parts': And(Use(int), lambda n: 1 <= n <= 9)
             }
-        ]
+        ],
+        'title': And(Use(str), len)
     })
     try:
         schema.validate(data)
@@ -37,6 +40,7 @@ def is_valid_schema(data):
 
 
 # ROUTES
+
 
 @app.route('/drinks')
 @requires_auth('get:drinks')
@@ -127,6 +131,7 @@ def delete_drink(drink_id):
 
 
 # Error Handling
+
 
 @app.errorhandler(400)
 def bad_request(error):
